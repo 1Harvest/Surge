@@ -1,8 +1,9 @@
-# > ifsp (duonao)
+# > ifsp
 USER-AGENT,IFVod_iOS-iPad*
 DOMAIN-SUFFIX,ifsp.tv
 DOMAIN-SUFFIX,ifsp1.tv
 DOMAIN-SUFFIX,jssp.tv
+DOMAIN-SUFFIX,flyv.tv
 DOMAIN-SUFFIX,ifvod.tv
 DOMAIN-SUFFIX,wyav.tv
 DOMAIN-SUFFIX,dnvodcdn.me
