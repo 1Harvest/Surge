@@ -28,7 +28,7 @@ TrafficStatistics = script-name=TrafficStatistics, title="流量统计", content
 net-info-panel = script-name=net-info-panel, title="网络状态", content="请刷新", style=info, update-interval=1
 
 #节点信息
-node-info = script-name=node-info, title="节点信息", content="请刷新", update-interval=1
+node-info = script-name=node-info, title="节点信息", content="请刷新", style=info, update-interval=10
 
 #清除DNS缓存
 flushDNS = script-name=flushDNS, title="Flush DNS", content="请刷新", update-interval=600
