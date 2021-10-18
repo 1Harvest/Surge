@@ -11,9 +11,6 @@ TrafficStatistics = type=generic,timeout=10,script-path= https://raw.githubuserc
 #网络信息
 net-info-panel = type=generic,timeout=5,script-path=https://raw.githubusercontent.com/Peng-YM/QuanX/master/Tools/Panels/NetInfo/net-info-panel.js
 
-#节点信息
-node-info = type=generic,timeout=5,script-path=https://raw.githubusercontent.com/fishingworld/something/main/PanelScripts/net_info.js
-
 #清除DNS缓存
 flushDNS = type=generic,timeout=5,script-path=https://raw.githubusercontent.com/zZPiglet/Task/master/asset/flushDNS.js,argument=title=DNS FLush&icon=arrow.clockwise&color=#3d3d5b
 
@@ -26,9 +23,6 @@ TrafficStatistics = script-name=TrafficStatistics, title="流量统计", content
 
 #网络信息
 net-info-panel = script-name=net-info-panel, title="网络状态", content="请刷新", style=info, update-interval=1
-
-#节点信息
-node-info = script-name=node-info, title="节点信息", content="请刷新", style=info, update-interval=10
 
 #清除DNS缓存
 flushDNS = script-name=flushDNS, title="Flush DNS", content="请刷新", update-interval=600
