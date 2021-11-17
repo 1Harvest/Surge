@@ -114,8 +114,6 @@ function getRmainingDays(resetDay) {
 
   let now = new Date();
   let today = now.getDate();
-  let month = now.getMonth();
-  let year = now.getFullYear();
   let daysInMonth;
 
   if (resetDay > today) {
