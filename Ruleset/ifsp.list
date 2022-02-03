@@ -1,5 +1,6 @@
-# > ifsp
+# > iyf
 USER-AGENT,IFVod_iOS-iPad*
+DOMAIN-SUFFIX,iyf.tv
 DOMAIN-SUFFIX,ifsp.tv
 DOMAIN-SUFFIX,ifsp1.tv
 DOMAIN-SUFFIX,jssp.tv
