@@ -21,7 +21,8 @@ $httpClient.get('http://ip-api.com/json/?lang=en', function (error, response, da
       title:rootName,
       content:
 		`国家地区: ${jsonData.country} - ${jsonData.city}\n`+
-      `运营商 : ${jsonData.isp}`,
+      `运营商 : ${jsonData.isp}\n` +
+		`节点IP: ${jsonData.query}`,
       icon: params.icon,
 		  "icon-color":params.color
     });
@@ -46,3 +47,4 @@ function getParams(param) {
       .map(([k, v]) => [k, decodeURIComponent(v)])
   );
 }
+
