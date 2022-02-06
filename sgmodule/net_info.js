@@ -20,9 +20,8 @@ $httpClient.get('http://ip-api.com/json/?lang=en', function (error, response, da
     $done({
       title:rootName,
       content:
-		`国家地区: ${jsonData.country} - ${jsonData.city}\n`+
-      `运营商: ${jsonData.isp}\n` +
-		`节点IP: ${jsonData.query}`,
+		`IP位置: ${jsonData.country} - ${jsonData.city}\n`+
+      `运营商: ${jsonData.isp}`,
       icon: params.icon,
 		  "icon-color": params.color
     });
