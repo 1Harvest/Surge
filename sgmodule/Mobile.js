@@ -1,4 +1,4 @@
-const url = "https://search.10086.cn/log_collecter/collecter.do";
+const url = "http://search.10086.cn/log_collecter/collecter.do";
 const url2 = "https://e.189.cn/store/user/balance_new.do";
 
 (async () => {
