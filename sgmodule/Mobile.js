@@ -64,7 +64,7 @@ function saveRequest() {
     headers: headers,
     body: $request.body,
   };
-  $persistentStore.write(JSON.stringify(request), "telecom");
+  $persistentStore.write(JSON.stringify(request), "mobile");
   $notification.post("Done", "成功保存请求信息", "");
 }
 
