@@ -1,4 +1,4 @@
-const url = "https://e.189.cn/store/user/package_detail.do";
+const url = "https://search.10086.cn/log_collecter/collecter.do";
 const url2 = "https://e.189.cn/store/user/balance_new.do";
 
 (async () => {
@@ -8,9 +8,9 @@ const url2 = "https://e.189.cn/store/user/balance_new.do";
     return;
   }
 
-  let request = JSON.parse($persistentStore.read("telecom"));
+  let request = JSON.parse($persistentStore.read("mobile"));
   let usage = await Request(url, "post", request.headers, request.body);
-  let balance = await Request(url2, "post", request.headers, request.body); 
+  let balance = await Request(url, "post", request.headers, request.body); 
   if (!usage || !balance  || (usage.result < 0)) $done();
   let total = usage.total * 1024;
   let used = usage.used * 1024;
@@ -18,7 +18,7 @@ const url2 = "https://e.189.cn/store/user/balance_new.do";
   let voice = usage.voiceBalance;
   let args = getArgs();
   $done({
-    title: `${args.title || "中国电信"} | ${getTime()}`,
+    title: `${args.title || "中国移动"} | ${getTime()}`,
     content: `流量：${bytesToSize(used)} | ${bytesToSize(total)}\n余额：${
       fee / 100
     } 元\n语音：${voice} 分钟`,
