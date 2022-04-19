@@ -119,7 +119,7 @@ function getRmainingDays(resetDay) {
   if (resetDay > today) {
     daysInMonth = 0;
   } else {
-    daysInMonth = 31;
+    daysInMonth = 30;
   }
 
   return daysInMonth - today + resetDay;
