@@ -119,10 +119,10 @@ function getRmainingDays(resetDay) {
   if (resetDay > today) {
     daysInMonth = 0;
   } else {
-    daysInMonth = 30;
+    daysInMonth = 31;
   }
 
-  return daysInMonth - today + resetDay;
+  return daysInMonth - today + resetDay - 1;
 }
 
 function bytesToSize(bytes) {
