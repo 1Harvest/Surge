@@ -1,7 +1,5 @@
 ;(async () => {
 
-
-
 let params = getParams($argument)
 //获取根节点名
 let proxy = await httpAPI("/v1/policy_groups");
@@ -46,4 +44,3 @@ function getParams(param) {
       .map(([k, v]) => [k, decodeURIComponent(v)])
   );
 }
-
