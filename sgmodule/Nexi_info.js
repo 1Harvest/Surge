@@ -27,11 +27,8 @@ let args = getArgs();
   let used = info.download + info.upload;
   let total = info.total;
   let expire = args.expire || info.expire;
-  let content = [`剩餘: ${((total-used)/(1024**3)).toFixed(2)} GB｜重置: ${resetDayLeft} Days`];
+  let content = [`剩余: ${((total-used)/(1024**3)).toFixed(2)} GB｜ ${resetDayLeft} Days`];
 
-  if (resetDayLeft) {
-    content.push(`重置：剩余${resetDayLeft}天`);
-  }
   if (expire && expire !== "false") {
     if (/^[\d.]+$/.test(expire)) expire *= 1000;
     content.push(`到期：${formatTime(expire)}`);
