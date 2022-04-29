@@ -39,7 +39,7 @@ Sub_info = script-name=Sub_info,update-interval=86400
   let total = info.total;
   let expire = args.expire || info.expire;
   let proportion = used / total;
-  let content = [`𝗨𝘀𝗮𝗴𝗲 : ${toPercent(proportion)} | 𝗕𝗔𝗟 : ${bytesToSize(total-used)}`];
+  let content = [`𝗨𝘀𝗮𝗴𝗲 : ${toPercent(proportion)} | 𝗕𝗮𝗹𝗮𝗻𝗰𝗲 : ${bytesToSize(total-used)}`];
 
 /*
   if (resetDayLeft) {
@@ -139,7 +139,7 @@ function bytesToSize(bytes) {
   sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
   let i = Math.floor(Math.log(bytes) / Math.log(k));
   if (i === 4 ) return (((bytes / Math.pow(k, i)))*1024).toFixed(2)+ " " + sizes[i-1];
-  return (bytes / Math.pow(k, i)).toFixed(2) + " " + sizes[i];
+  return (bytes / Math.pow(k, i)).toFixed(1) + " " + sizes[i];
 }
 
 function formatTime(time) {
@@ -151,6 +151,6 @@ function formatTime(time) {
 }
 
 function toPercent(proportion) {
-  const percent = Number(proportion*100).toFixed(2);
+  const percent = Number(proportion*100).toFixed(1);
   return percent + "%";
 }
