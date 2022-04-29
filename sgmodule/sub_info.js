@@ -39,7 +39,7 @@ Sub_info = script-name=Sub_info,update-interval=86400
   let total = info.total;
   let expire = args.expire || info.expire;
   let proportion = used / total;
-  let content = [`𝗨𝘀𝗲𝗱 : ${toPercent(proportion)} | 𝗔𝘃𝗹 : ${bytesToSize(total-used)}`];
+  let content = [`**Usage** : ${toPercent(proportion)} | **Bal** : ${bytesToSize(total-used)}`];
 
 /*
   if (resetDayLeft) {
@@ -127,7 +127,7 @@ function getRmainingDays(resetDay) {
   if (resetDay > today) {
     daysInMonth = 0;
   } else {
-    daysInMonth = new Date(year, month + 1, 0).getDate();
+    daysInMonth = 31;
   }
 
   return daysInMonth - today + resetDay;
