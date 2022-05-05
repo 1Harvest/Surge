@@ -53,6 +53,7 @@ Sub_info = script-name=Sub_info,update-interval=86400
     content.push(`到期：${formatTime(expire)}`);
   }
 */
+
   let now = new Date();
   let hour = now.getHours();
   let minutes = now.getMinutes();
