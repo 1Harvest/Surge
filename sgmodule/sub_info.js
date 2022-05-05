@@ -42,6 +42,8 @@ Sub_info = script-name=Sub_info,update-interval=86400
   let content = [`𝗨𝘀𝗮𝗴𝗲 : ${toPercent(proportion)} | 𝗕𝗮𝗹 : ${bytesToSize(total-used)}`];
 
 /*
+  let content = [`剩余：${((total-used)/(1024**3)).toFixed(2)} GB | ${resetDayLeft} 天`];
+  
   if (resetDayLeft) {
     content.push(`重置：剩余${resetDayLeft}天`);
   }
