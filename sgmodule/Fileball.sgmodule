@@ -10,7 +10,7 @@
 # PikPak 直接填账号密码
 
 [General]
-# > MPV支持
+# > MPV播放器支持
 force-http-engine-hosts = %APPEND% aliyun.example.com:0, quark.example.com:0, pikpak.example.com:0
 
 [Script]
