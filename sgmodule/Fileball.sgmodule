@@ -1,4 +1,4 @@
-#!name=Fileball挂载
+#!name=Fileball mounting
 #!desc=添加Synology协议，账号随便填，密码填cookie
 
 ########## 获取ck的方法 #########
@@ -11,7 +11,7 @@
 
 [General]
 # > MPV支持
-force-http-engine-hosts = %APPEND% aliyun.example.com:0,quark.example.com:0,pikpak.example.com:0
+force-http-engine-hosts = %APPEND% aliyun.example.com:0, quark.example.com:0, pikpak.example.com:0
 
 [Script]
 aliyun = type=http-request,pattern=^https?:\/\/aliyun\.example\.com,requires-body=1,max-size=0,timeout=10,script-path=https://raw.githubusercontent.com/1Harvest/Surge/main/sgmodule/aliyun.js
