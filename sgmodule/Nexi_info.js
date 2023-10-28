@@ -7,6 +7,7 @@ Surge配置参考注释，
 ----------------------------------------
 [Script]
 Sub_info = type=generic,timeout=10,script-path=https://raw.githubusercontent.com/chaizia/Profiles/master/MySurge/sub_info_panel.js,script-update-interval=0,argument=url=[URL encode 后的机场节点链接]&title=AmyInfo&icon=bonjour&color=#007aff&starting_date=2023-10-20
+
 [Panel]
 Sub_info = script-name=Sub_info,update-interval=86400
 ----------------------------------------
@@ -20,6 +21,7 @@ Sub_info = script-name=Sub_info,update-interval=86400
 可选参数"icon=xxx" 可以自定义图标，内容为任意有效的 SF Symbol Name，如 bolt.horizontal.circle.fill，详细可以下载app https://apps.apple.com/cn/app/sf-symbols-browser/id1491161336
 
 可选参数"color=xxx" 当使用 icon 字段时，可传入 color 字段控制图标颜色，字段内容为颜色的 HEX 编码。如：color=#007aff
+
 ----------------------------------------
 */
 
@@ -101,23 +103,19 @@ async function getDataInfo(url) {
   );
 }
 
-function getRmainingDays(startingDate, interval) {
+function getRemainingDays(startingDate, interval) {
     if (!startingDate || !interval) return;
 
     let now = new Date();
     let startDate = new Date(startingDate);
+    let daysPassed = Math.floor((now - startDate) / (1000 * 60 * 60 * 24)); 
+    let intervalsPassed = Math.floor(daysPassed / interval); 
     let resetDate = new Date(startDate);
-    resetDate.setDate(startDate.getDate() + interval); // Initially set the reset date based on the interval
+    resetDate.setDate(startDate.getDate() + interval * (intervalsPassed + 1));
 
-    // Adjust the startingDate forward by intervals of 31 days until it's ahead of the current date
-    while (now >= resetDate) {
-        startDate.setDate(startDate.getDate() + interval);
-        resetDate.setDate(startDate.getDate() + interval);
-    }
+    let remainingDays = Math.ceil((resetDate - now) / (1000 * 60 * 60 * 24));
 
-    let remainingDays = Math.ceil((resetDate - now) / (1000 * 60 * 60 * 24)); // Calculate the remaining days
-
-    return remainingDays;
+    return remainingDays; 
 }
 
 function bytesToSize(bytes) {
