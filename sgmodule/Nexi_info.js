@@ -9,15 +9,14 @@ Surge配置参考注释，
 示例↓↓↓ 
 ----------------------------------------
 [Script]
-Sub_info = type=generic,timeout=10,script-path= https://raw.githubusercontent.com/chaizia/Profiles/master/MySurge/sub_info_panel.js,script-update-interval=0,argument=url=[URL encode 后的机场节点链接]&reset_day=1&title=AmyInfo&icon=bonjour&color=#007aff
-
+Sub_info = type=generic,timeout=10,script-path=https://raw.githubusercontent.com/chaizia/Profiles/master/MySurge/sub_info_panel.js,script-update-interval=0,argument=url=[URL encode 后的机场节点链接]&title=AmyInfo&icon=bonjour&color=#007aff&starting_date=2023-10-20
 [Panel]
 Sub_info = script-name=Sub_info,update-interval=86400
 ----------------------------------------
 
 先将带有流量信息的节点订阅链接encode，用encode后的链接替换"url="后面的[机场节点链接]
 
-可选参数 &reset_day，后面的数字替换成流量每月重置的日期，如1号就写1，8号就写8。如"&reset_day=8",不加该参数不显示流量重置信息。
+可选参数 &starting_date，后面的数字替换成订阅开始日期。如"&2023-10-20",不加该参数不显示流量重置信息。
 
 可选参数 &expire，机场链接不带expire信息的，可以手动传入expire参数，如"&expire=2022-02-01",注意一定要按照yyyy-MM-dd的格式。
 
@@ -33,26 +32,14 @@ Sub_info = script-name=Sub_info,update-interval=86400
   let args = getArgs();
   let info = await getDataInfo(args.url);
   if (!info) $done();
-  let resetDayLeft = getRmainingDays(parseInt(args["reset_day"]));
+  let startingDate = args.starting_date;
+  let resetDayLeft = getRmainingDays(startingDate, 31)
   
   let used = info.download + info.upload;
   let total = info.total;
   let expire = args.expire || info.expire;
   let proportion = used / total;
   let content = [`𝗨𝘀𝗮𝗴𝗲 : ${toPercent(proportion)} | 𝗕𝗮𝗹 : ${bytesToSize(total-used)}`];
-
-/*
-  let content = [`剩余：${((total-used)/(1024**3)).toFixed(2)} GB | ${resetDayLeft} 天`];
-  
-  if (resetDayLeft) {
-    content.push(`重置：剩余${resetDayLeft}天`);
-  }
-
-  if (expire) {
-    if (/^[\d.]+$/.test(expire)) expire *= 1000;
-    content.push(`到期：${formatTime(expire)}`);
-  }
-*/
 
   let now = new Date();
   let hour = now.getHours();
@@ -118,22 +105,23 @@ async function getDataInfo(url) {
   );
 }
 
-function getRmainingDays(resetDay) {
-  if (!resetDay) return;
+function getRmainingDays(startingDate, interval) {
+    if (!startingDate || !interval) return;
 
-  let now = new Date();
-  let today = now.getDate();
-  let month = now.getMonth();
-  let year = now.getFullYear();
-  let daysInMonth;
+    let now = new Date();
+    let startDate = new Date(startingDate);
+    let resetDate = new Date(startDate);
+    resetDate.setDate(startDate.getDate() + interval); // Initially set the reset date based on the interval
 
-  if (resetDay > today) {
-    daysInMonth = 0;
-  } else {
-    daysInMonth = 31;
-  }
+    // Adjust the startingDate forward by intervals of 31 days until it's ahead of the current date
+    while (now >= resetDate) {
+        startDate.setDate(startDate.getDate() + interval);
+        resetDate.setDate(startDate.getDate() + interval);
+    }
 
-  return daysInMonth - today + resetDay;
+    let remainingDays = Math.ceil((resetDate - now) / (1000 * 60 * 60 * 24)); // Calculate the remaining days
+
+    return remainingDays;
 }
 
 function bytesToSize(bytes) {
