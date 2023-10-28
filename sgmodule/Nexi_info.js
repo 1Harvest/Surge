@@ -30,8 +30,8 @@ Sub_info = script-name=Sub_info,update-interval=86400
   let info = await getDataInfo(args.url);
   if (!info) $done();
   let startingDate = args.starting_date;
-  let resetDayLeft = getRmainingDays(startingDate, 31)
-  let title;
+  let resetDayLeft = getRmainingDays(startingDate, 31);
+  let title = resetDayLeft ? `${args.title} ` + `| 𝗥𝗲𝘀𝗲𝘁 : ` + `${resetDayLeft} Days` : args.title;
 
   let used = info.download + info.upload;
   let total = info.total;
@@ -44,12 +44,6 @@ Sub_info = script-name=Sub_info,update-interval=86400
   let minutes = now.getMinutes();
   hour = hour > 9 ? hour : "0" + hour;
   minutes = minutes > 9 ? minutes : "0" + minutes;
-
-  if (resetDayLeft) {
-      title: `${args.title} ` + `| 𝗥𝗲𝘀𝗲𝘁 : ` + `${resetDayLeft} Days`;
-  } else {
-      title = args.title;
-  }
   
   $done({
     title: title,
