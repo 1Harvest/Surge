@@ -1,9 +1,6 @@
 /*
 模板来自@mieqq大佬（转大佬感谢：感谢@asukanana,感谢@congcong.）。
 
-感谢@mieqq大佬
-感谢@W cyber大佬的计算上的帮助。
-
 Surge配置参考注释，
 
 示例↓↓↓ 
@@ -34,7 +31,8 @@ Sub_info = script-name=Sub_info,update-interval=86400
   if (!info) $done();
   let startingDate = args.starting_date;
   let resetDayLeft = getRmainingDays(startingDate, 31)
-  
+  let title;
+
   let used = info.download + info.upload;
   let total = info.total;
   let expire = args.expire || info.expire;
@@ -47,8 +45,14 @@ Sub_info = script-name=Sub_info,update-interval=86400
   hour = hour > 9 ? hour : "0" + hour;
   minutes = minutes > 9 ? minutes : "0" + minutes;
 
+  if (resetDayLeft) {
+      title: `${args.title} ` + `| 𝗥𝗲𝘀𝗲𝘁 : ` + `${resetDayLeft} Days`;
+  } else {
+      title = args.title;
+  }
+  
   $done({
-    title: `${args.title} ` + `| 𝗥𝗲𝘀𝗲𝘁 : ` + `${resetDayLeft} Days`,
+    title: title,
     content: content.join("\n"),
     icon: args.icon || "airplane.circle",
     "icon-color": args.color || "#007aff",
