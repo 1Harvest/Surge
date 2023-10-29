@@ -63,7 +63,7 @@ function getArgs() {
 }
 
 function getUserInfo(url) {
-  let request = { headers: { "User-Agent": "Quantumult%20X" }, url };
+  let request = { headers: { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6.4 Safari/605.1.15" }, url };
   return new Promise((resolve, reject) =>
     $httpClient.get(request, (err, resp) => {
       if (err != null) {
