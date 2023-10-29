@@ -106,8 +106,8 @@ function getRemainingDays(startingDate, interval) {
 function getRemainingDays(startingDate, interval) {
     if (!startingDate || !interval) return;
 
-    let now = new Date('2024-02-17'); // Setting "now" to the target date for the test
-    let startDate = new Date(startingDate);
+    let now = new Date().getTime(); 
+    let startDate = new Date(startingDate).getTime(); 
     let daysPassed = Math.floor((now - startDate) / (1000 * 60 * 60 * 24)); 
     let remainingDays = interval - (daysPassed % interval); 
 
