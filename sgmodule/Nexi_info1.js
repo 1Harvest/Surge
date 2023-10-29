@@ -1,6 +1,30 @@
 /*
- * 由@mieqq编写
- * 原脚本地址：https://raw.githubusercontent.com/mieqq/mieqq/master/sub_info_panel.js
+* 由@mieqq编写
+
+* 原脚本地址：https://raw.githubusercontent.com/mieqq/mieqq/master/sub_info_panel.js
+
+Surge配置参考注释，
+
+示例↓↓↓ 
+----------------------------------------
+[Script]
+Sub_info = type=generic,timeout=10,script-path=https://raw.githubusercontent.com/Rabbit-Spec/Surge/Master/Module/Panel/Sub-info/Moore/Sub-info.js,script-update-interval=0,argument=url=[URL encode 后的机场节点链接]&title=AmyInfo&icon=bonjour&color=#007aff&starting_date=2023-01-07
+
+[Panel]
+Sub_info = script-name=Sub_info,update-interval=86400
+----------------------------------------
+
+先将带有流量信息的节点订阅链接encode，用encode后的链接替换"url="后面的[机场节点链接]
+
+可选参数 "starting_date=2023-01-07"，后面的数字替换成订阅开始日期，注意一定要按照yyyy-MM-dd的格式，不加该参数不显示流量重置信息。
+
+可选参数 "title=xxx" 可以自定义标题。
+
+可选参数 "icon=xxx" 可以自定义图标，内容为任意有效的 SF Symbol Name，如 bolt.horizontal.circle.fill，详细可以下载app https://apps.apple.com/cn/app/sf-symbols-browser/id1491161336
+
+可选参数 "color=xxx" 当使用 icon 字段时，可传入 color 字段控制图标颜色，字段内容为颜色的 HEX 编码。如：color=#007aff
+
+----------------------------------------
 */
 
 let args = getArgs();
@@ -83,7 +107,6 @@ async function getDataInfo(url) {
   );
 }
 
-/*
 function getRmainingDays(startingDate, interval) {
     if (!startingDate || !interval) return;
 
@@ -99,16 +122,6 @@ function getRmainingDays(startingDate, interval) {
 
     let remainingDays = Math.ceil((resetDate - now) / (1000 * 60 * 60 * 24)); 
     return remainingDays;
-}
-*/
-
-function getRemainingDays(startingDate, interval) {
-    if (!startingDate || !interval) return;
-    let now = new Date(); // current date
-    let start_date = new Date(startingDate); // starting date
-    let days_passed = (now - start_date) / (1000 * 60 * 60 * 24);
-    let days_until_next_reset = interval - (days_passed % interval);
-    return Math.ceil(days_until_next_reset);
 }
 
 function bytesToSize(bytes) {
