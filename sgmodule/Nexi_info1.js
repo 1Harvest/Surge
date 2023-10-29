@@ -16,7 +16,7 @@ let args = getArgs();
   let used = info.download + info.upload;
   let total = info.total;
   let expire = args.expire || info.expire;
-  let content = [`𝗨𝘀𝗮𝗴𝗲 : ${toPercent(used/total)} | 𝗕𝗮𝗹 : ${bytesToSize(total-used)}`];
+  let content = [`𝗨𝘀𝗮𝗴𝗲 : ${bytesToSize(used)} | 𝗕𝗮𝗹 : ${bytesToSize(total-used)}`];
 
   let now = new Date();
   let hour = now.getHours();
