@@ -83,6 +83,7 @@ async function getDataInfo(url) {
   );
 }
 
+/*
 function getRmainingDays(startingDate, interval) {
     if (!startingDate || !interval) return;
 
@@ -98,6 +99,16 @@ function getRmainingDays(startingDate, interval) {
 
     let remainingDays = Math.ceil((resetDate - now) / (1000 * 60 * 60 * 24)); 
     return remainingDays;
+}
+*/
+
+function getRemainingDays(startingDate, interval) {
+    if (!startingDate || !interval) return;
+    let now = new Date(); // current date
+    let start_date = new Date(startingDate); // starting date
+    let days_passed = (now - start_date) / (1000 * 60 * 60 * 24);
+    let days_until_next_reset = interval - (days_passed % interval);
+    return Math.ceil(days_until_next_reset);
 }
 
 function bytesToSize(bytes) {
