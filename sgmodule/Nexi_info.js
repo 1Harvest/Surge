@@ -14,13 +14,13 @@ Sub_info = script-name=Sub_info,update-interval=86400
 
 先将带有流量信息的节点订阅链接encode，用encode后的链接替换"url="后面的[机场节点链接]
 
-可选参数 &starting_date，后面的数字替换成订阅开始日期，不加该参数不显示流量重置信息。如"&2023-01-07"，注意一定要按照yyyy-MM-dd的格式。
+可选参数 "starting_date=2023-01-07"，后面的数字替换成订阅开始日期，注意一定要按照yyyy-MM-dd的格式，不加该参数不显示流量重置信息。
 
-可选参数"title=xxx" 可以自定义标题。
+可选参数 "title=xxx" 可以自定义标题。
 
-可选参数"icon=xxx" 可以自定义图标，内容为任意有效的 SF Symbol Name，如 bolt.horizontal.circle.fill，详细可以下载app https://apps.apple.com/cn/app/sf-symbols-browser/id1491161336
+可选参数 "icon=xxx" 可以自定义图标，内容为任意有效的 SF Symbol Name，如 bolt.horizontal.circle.fill，详细可以下载app https://apps.apple.com/cn/app/sf-symbols-browser/id1491161336
 
-可选参数"color=xxx" 当使用 icon 字段时，可传入 color 字段控制图标颜色，字段内容为颜色的 HEX 编码。如：color=#007aff
+可选参数 "color=xxx" 当使用 icon 字段时，可传入 color 字段控制图标颜色，字段内容为颜色的 HEX 编码。如：color=#007aff
 
 ----------------------------------------
 */
