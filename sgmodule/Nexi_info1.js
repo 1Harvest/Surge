@@ -101,7 +101,7 @@ function getRemainingDays(startingDate, interval) {
 
     return remainingDays; 
 }
-*/
+
 
 function getRemainingDays(startingDate, interval) {
     if (!startingDate || !interval) return;
@@ -112,6 +112,26 @@ function getRemainingDays(startingDate, interval) {
     let remainingDays = interval - (daysPassed % interval); 
 
     return remainingDays; 
+}
+*/
+
+function getRmainingDays(startingDate, interval) {
+    if (!startingDate || !interval) return;
+
+    let now = new Date();
+    let startDate = new Date(startingDate);
+    let resetDate = new Date(startDate);
+    resetDate.setDate(startDate.getDate() + interval); // Initially set the reset date based on the interval
+
+    // Adjust the startingDate forward by intervals of 31 days until it's ahead of the current date
+    while (now >= resetDate) {
+        startDate.setDate(startDate.getDate() + interval);
+        resetDate.setDate(startDate.getDate() + interval);
+    }
+
+    let remainingDays = Math.ceil((resetDate - now) / (1000 * 60 * 60 * 24)); // Calculate the remaining days
+
+    return remainingDays;
 }
 
 function bytesToSize(bytes) {
