@@ -11,20 +11,15 @@ let args = getArgs();
 (async () => {
   let info = await getDataInfo(args.url);
   if (!info) $done();
-  let resetDayLeft = getRmainingDays(parseInt(args["reset_day"]));
+
+  let startingDate = args.starting_date;
+  let resetDayLeft = getRmainingDays(startingDate, 31);
+  let title = resetDayLeft ? `${args.title} ` + `| 𝗥𝗲𝘀𝗲𝘁 : ` + `${resetDayLeft} Days` : args.title;
 
   let used = info.download + info.upload;
   let total = info.total;
   let expire = args.expire || info.expire;
   let content = [`用量：${bytesToSize(used)} | ${bytesToSize(total)}`];
-
-  if (resetDayLeft) {
-    content.push(`重置：剩余${resetDayLeft}天`);
-  }
-  if (expire && expire !== "false") {
-    if (/^[\d.]+$/.test(expire)) expire *= 1000;
-    content.push(`到期：${formatTime(expire)}`);
-  }
 
   let now = new Date();
   let hour = now.getHours();
@@ -33,7 +28,7 @@ let args = getArgs();
   minutes = minutes > 9 ? minutes : "0" + minutes;
 
   $done({
-    title: `${args.title} | ${hour}:${minutes}`,
+    title: title,
     content: content.join("\n"),
     icon: args.icon || "airplane.circle",
     "icon-color": args.color || "#007aff",
@@ -91,22 +86,19 @@ async function getDataInfo(url) {
   );
 }
 
-function getRmainingDays(resetDay) {
-  if (!resetDay) return;
+function getRemainingDays(startingDate, interval) {
+    if (!startingDate || !interval) return;
 
-  let now = new Date();
-  let today = now.getDate();
-  let month = now.getMonth();
-  let year = now.getFullYear();
-  let daysInMonth;
+    let now = new Date();
+    let startDate = new Date(startingDate);
+    let daysPassed = Math.floor((now - startDate) / (1000 * 60 * 60 * 24)); 
+    let intervalsPassed = Math.floor(daysPassed / interval); 
+    let resetDate = new Date(startDate);
+    resetDate.setDate(startDate.getDate() + interval * (intervalsPassed + 1));
 
-  if (resetDay > today) {
-    daysInMonth = 0;
-  } else {
-    daysInMonth = new Date(year, month + 1, 0).getDate();
-  }
+    let remainingDays = Math.ceil((resetDate - now) / (1000 * 60 * 60 * 24));
 
-  return daysInMonth - today + resetDay;
+    return remainingDays; 
 }
 
 function bytesToSize(bytes) {
