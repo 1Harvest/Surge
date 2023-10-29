@@ -39,14 +39,7 @@ let args = getArgs();
 
   let used = info.download + info.upload;
   let total = info.total;
-  let expire = args.expire || info.expire;
   let content = [`𝗨𝘀𝗮𝗴𝗲 : ${(used/total*100).toFixed(2)}% | 𝗕𝗮𝗹 : ${bytesToSize(total-used)}`];
-
-  let now = new Date();
-  let hour = now.getHours();
-  let minutes = now.getMinutes();
-  hour = hour > 9 ? hour : "0" + hour;
-  minutes = minutes > 9 ? minutes : "0" + minutes;
 
   $done({
     title: title,
@@ -130,12 +123,4 @@ function bytesToSize(bytes) {
   sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
   let i = Math.floor(Math.log(bytes) / Math.log(k));
   return (bytes / Math.pow(k, i)).toFixed(2) + " " + sizes[i];
-}
-
-function formatTime(time) {
-  let dateObj = new Date(time);
-  let year = dateObj.getFullYear();
-  let month = dateObj.getMonth() + 1;
-  let day = dateObj.getDate();
-  return year + "年" + month + "月" + day + "日";
 }
