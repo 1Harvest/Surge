@@ -34,7 +34,7 @@ let args = getArgs();
   if (!info) $done();
 
   let resetDays = getRemainingDays(args.starting_date, 31);
-  let title = resetDays ? `${args.title} ` + `| 𝗥𝗲𝘀𝗲𝘁 : ` + `${resetDays} Days` : args.title;
+  let title = resetDays ? `${args.title} ` + `| 𝗥𝗲𝘀𝗲𝘁 : ` + `${resetDays} ${resetDays === 1 ? "Day" : "Days"}` : args.title;
 
   let used = info.download + info.upload;
   let total = info.total;
