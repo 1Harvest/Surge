@@ -1,5 +1,5 @@
 /*
-* 由@mieqq编写
+* 模板由@mieqq编写
 
 * 原脚本地址：https://raw.githubusercontent.com/mieqq/mieqq/master/sub_info_panel.js
 
@@ -33,8 +33,8 @@ let args = getArgs();
   let info = await getDataInfo(args.url);
   if (!info) $done();
 
-  let resetDaysLeft = getRemainingDays(args.starting_date, 31);
-  let title = resetDaysLeft ? `${args.title} ` + `| 𝗥𝗲𝘀𝗲𝘁 : ` + `${resetDaysLeft} Days` : args.title;
+  let resetDays = getRemainingDays(args.starting_date, 31);
+  let title = resetDays ? `${args.title} ` + `| 𝗥𝗲𝘀𝗲𝘁 : ` + `${resetDays} Days` : args.title;
 
   let used = info.download + info.upload;
   let total = info.total;
@@ -101,7 +101,6 @@ async function getDataInfo(url) {
 
 function getRemainingDays(startingDate, interval) {
     if (!startingDate || !interval) return;
-
     const ms_perday = 1000 * 60 * 60 * 24; 
     let now = new Date(); 
     let startdate = new Date(startingDate); 
