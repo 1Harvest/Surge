@@ -117,18 +117,15 @@ function getRemainingDays(startingDate, interval) {
 function getRemainingDays(startingDate, interval) {
     if (!startingDate || !interval) return;
 
-    let now = new Date();
-    let resetDate = new Date(startingDate);
-    
-    let daysPassed = Math.ceil((now - resetDate) / (1000 * 60 * 60 * 24));
-    let intervalsPassed = Math.floor(daysPassed / interval);
+    const MS_PER_DAY = 1000 * 60 * 60 * 24; 
+    let now = new Date(); 
+    let start_date = new Date(startingDate); 
 
-    let daysToAdd = (daysPassed % interval) === 0 ? interval : (intervalsPassed + 1) * interval - daysPassed;
-    resetDate.setDate(resetDate.getDate() + daysToAdd);
+    let days_passed = (now - start_date) / MS_PER_DAY;
+    let days_until_next_reset = interval - (days_passed % interval);
 
-    let remainingDays = Math.ceil((resetDate - now) / (1000 * 60 * 60 * 24));
-    return remainingDays;
-}
+    return Math.ceil(days_until_next_reset);
+} 
 
 function bytesToSize(bytes) {
   if (bytes === 0) return "0B";
