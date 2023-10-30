@@ -16,7 +16,7 @@ Sub_info = script-name=Sub_info,update-interval=86400
 
 先将带有流量信息的节点订阅链接encode，用encode后的链接替换"url="后面的[机场节点链接]
 
-可选参数 "starting_date=2023-01-07"，后面的数字替换成订阅开始日期，注意一定要按照yyyy-MM-dd的格式，不加该参数不显示流量重置信息。
+可选参数 "starting_date=2023-01-07"，后面的数字替换成订阅开始/重置日期，注意一定要按照yyyy-MM-dd的格式，不加该参数不显示流量重置信息。
 
 可选参数 "title=xxx" 可以自定义标题。
 
@@ -33,9 +33,8 @@ let args = getArgs();
   let info = await getDataInfo(args.url);
   if (!info) $done();
 
-  let startingDate = args.starting_date;
-  let resetDayLeft = getRmainingDays(startingDate, 31);
-  let title = resetDayLeft ? `${args.title} ` + `| 𝗥𝗲𝘀𝗲𝘁 : ` + `${resetDayLeft} Days` : args.title;
+  let resetDaysLeft = getRemainingDays(args.starting_date, 31);
+  let title = resetDaysLeft ? `${args.title} ` + `| 𝗥𝗲𝘀𝗲𝘁 : ` + `${resetDaysLeft} Days` : args.title;
 
   let used = info.download + info.upload;
   let total = info.total;
@@ -100,17 +99,14 @@ async function getDataInfo(url) {
   );
 }
 
-function getRmainingDays(startingDate, interval) {
+function getRemainingDays(startingDate, interval) {
     if (!startingDate || !interval) return;
 
     let now = new Date();
-    let startDate = new Date(startingDate);
-    let resetDate = new Date(startDate);
-    resetDate.setDate(startDate.getDate() + interval); 
+    let resetDate = new Date(startingDate);
 
     while (now >= resetDate) {
-        startDate.setDate(startDate.getDate() + interval);
-        resetDate.setDate(startDate.getDate() + interval);
+        resetDate.setDate(resetDate.getDate() + interval);
     }
 
     let remainingDays = Math.ceil((resetDate - now) / (1000 * 60 * 60 * 24)); 
