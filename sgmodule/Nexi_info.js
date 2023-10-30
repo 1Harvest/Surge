@@ -98,7 +98,7 @@ async function getDataInfo(url) {
       .map(([k, v]) => [k, Number(v)])
   );
 }
-
+/*
 function getRemainingDays(startingDate, interval) {
     if (!startingDate || !interval) return;
 
@@ -110,6 +110,22 @@ function getRemainingDays(startingDate, interval) {
     }
 
     let remainingDays = Math.ceil((resetDate - now) / (1000 * 60 * 60 * 24)); 
+    return remainingDays;
+}
+*/
+
+function getRemainingDays(startingDate, interval) {
+    if (!startingDate || !interval) return;
+
+    let now = new Date();
+    let resetDate = new Date(startingDate);
+    
+    let daysPassed = Math.ceil((now - resetDate) / (1000 * 60 * 60 * 24));
+    let intervalsPassed = Math.floor(daysPassed / interval);
+    
+    resetDate.setDate(resetDate.getDate() + (intervalsPassed + 1) * interval);
+
+    let remainingDays = Math.ceil((resetDate - now) / (1000 * 60 * 60 * 24));
     return remainingDays;
 }
 
