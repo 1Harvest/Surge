@@ -122,8 +122,9 @@ function getRemainingDays(startingDate, interval) {
     
     let daysPassed = Math.ceil((now - resetDate) / (1000 * 60 * 60 * 24));
     let intervalsPassed = Math.floor(daysPassed / interval);
-    
-    resetDate.setDate(resetDate.getDate() + (intervalsPassed + 1) * interval);
+
+    let daysToAdd = (daysPassed % interval) === 0 ? interval : (intervalsPassed + 1) * interval - daysPassed;
+    resetDate.setDate(resetDate.getDate() + daysToAdd);
 
     let remainingDays = Math.ceil((resetDate - now) / (1000 * 60 * 60 * 24));
     return remainingDays;
