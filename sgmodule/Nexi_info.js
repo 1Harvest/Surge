@@ -98,21 +98,6 @@ async function getDataInfo(url) {
       .map(([k, v]) => [k, Number(v)])
   );
 }
-/*
-function getRemainingDays(startingDate, interval) {
-    if (!startingDate || !interval) return;
-
-    let now = new Date();
-    let resetDate = new Date(startingDate);
-
-    while (now >= resetDate) {
-        resetDate.setDate(resetDate.getDate() + interval);
-    }
-
-    let remainingDays = Math.ceil((resetDate - now) / (1000 * 60 * 60 * 24)); 
-    return remainingDays;
-}
-*/
 
 function getRemainingDays(startingDate, interval) {
     if (!startingDate || !interval) return;
