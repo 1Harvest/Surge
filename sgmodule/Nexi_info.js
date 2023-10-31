@@ -38,7 +38,7 @@ let args = getArgs();
 
   let used = info.download + info.upload;
   let total = info.total;
-  let content = [`𝗨𝘀𝗮𝗴𝗲 : ${(used/total*100).toFixed(2)}% | 𝗕𝗮𝗹 : ${bytesToSize(total-used)}`];
+  let content = [`𝗨𝘀𝗮𝗴𝗲 : ${((used/total*100) >= 10 ? (used/total*100).toFixed(1) : (used/total*100).toFixed(2))}% | 𝗕𝗮𝗹 : ${bytesToSize(total-used)}`];
 
   $done({
     title: title,
