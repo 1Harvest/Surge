@@ -103,8 +103,8 @@ async function getDataInfo(url) {
 function getRemainingDays(startingDate, interval) {
     if (!startingDate || !interval) return;
     const ms_perday = 1000 * 60 * 60 * 24; 
-    let now = new Date(); 
-    let startdate = new Date(startingDate); 
+    let now = new Date().getTime(); 
+    let startdate = new Date(startingDate).getTime(); 
     let dayspassed = (now - startdate) / ms_perday;
     let remainingDays = interval - (dayspassed % interval);
     return Math.ceil(remainingDays);
