@@ -158,7 +158,7 @@
     ipCount !== null ? `Static IPs: ${ipCount}` : null,
     `Days Left: ${daysLeft}`,
     `Today: ${fmtData(metrics.dayBW)}` + (estDayUSD ? ` ≈ ${fmtUSD(estDayUSD)}` : ""),
-    `Month: ${fmtData(metrics.monthBW)}` + (estMonthUSD ? ` ≈ ${fmtUSD(estMonthUSD)}` : ""),
+    `Month: ${fmtData(metrics.monthCost)}` + (estMonthUSD ? ` ≈ ${fmtUSD(estMonthUSD)}` : ""),
   ].filter(Boolean);
 
   $done({
