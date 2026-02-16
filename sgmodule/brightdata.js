@@ -109,12 +109,27 @@ httpGet(ipsUrl, (e1, ipsBody) => {
       $persistentStore.write(level, key);
     }
 
+    function fmtMBorGB(bytes, GB_BYTES) {
+        const n = Number(bytes);
+        if (!isFinite(n) || n < 0) return "—";
+      
+        const MB_BYTES = GB_BYTES / 1024;
+        if (n < GB_BYTES) {
+          const mb = n / MB_BYTES;
+          return `${mb.toFixed(mb >= 100 ? 0 : 1)} MB`;
+        } else {
+          const gb = n / GB_BYTES;
+          return `${gb.toFixed(gb >= 10 ? 1 : 3)} GB`;
+        }
+      }
+
     const lines = [
-    ipCount == null ? null : `Static IPs: ${ipCount}`,
-    `Today: ${fmtMBorGB(back_d0.bw, GB_BYTES)}` + (estDayUSD != null ? ` ≈ ${fmtUSD(estDayUSD)}` : ""),
-    `MTD:  ${fmtMBorGB(back_m0.bw, GB_BYTES)}` + (estMonthUSD != null ? ` ≈ ${fmtUSD(estMonthUSD)}` : ""),
-    back_m0.cost != null ? `API cost (MTD): ${fmtUSD(back_m0.cost)}` : null,
+      ipCount == null ? null : `Static IPs: ${ipCount}`,
+      `Today: ${fmtMBorGB(back_d0.bw, GB_BYTES)}` + (estDayUSD != null ? ` ≈ ${fmtUSD(estDayUSD)}` : ""),
+      `MTD:  ${fmtMBorGB(back_m0.bw, GB_BYTES)}` + (estMonthUSD != null ? ` ≈ ${fmtUSD(estMonthUSD)}` : ""),
+      back_m0.cost != null ? `API cost (MTD): ${fmtUSD(back_m0.cost)}` : null
     ].filter(Boolean);
+
 
     $done({ title: `Bright Data (${zone})`, style, content: lines.join("\n") });
   });
