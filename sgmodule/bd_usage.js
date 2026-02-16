@@ -159,7 +159,7 @@
     `Static IPs: ${ipCount || 0} | Days Left: ${daysLeft}`,
     
     // Line 2: Usage = Estimated Cost (based on pricePerGB)
-    `Month: ${fmtData(metrics.monthBW)}` + (estMonthUSD ? ` = ${fmtUSD(estMonthUSD)}` : ""),
+    `Month: ${fmtData(metrics.monthBW)}` + (estMonthUSD ? ` ≈ ${fmtUSD(estMonthUSD)}` : ""),
     
     // Line 3: The hard cost returned by the API
     metrics.monthCost != null ? `Actual Cost: ${fmtUSD(metrics.monthCost)}` : null
