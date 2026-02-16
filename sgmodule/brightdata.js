@@ -123,8 +123,32 @@ httpGet(ipsUrl, (e1, ipsBody) => {
         }
       }
 
+          function ymdUTC(d) {
+        const y = d.getUTCFullYear();
+        const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+        const day = String(d.getUTCDate()).padStart(2, "0");
+        return `${y}-${m}-${day}`;
+      }
+      
+      function nextBillingResetUTC(now = new Date()) {
+        // 1st of next month at 00:00 UTC
+        return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1, 0, 0, 0));
+      }
+      
+      function daysLeftToResetUTC(now = new Date()) {
+        const next = nextBillingResetUTC(now).getTime();
+        const msLeft = next - now.getTime();
+        // ceil so “partial day” counts as a day remaining (usually what you want in a dashboard)
+        return Math.max(0, Math.ceil(msLeft / 86400000));
+      }
+
+
+    const now = new Date();
+    const reset = nextBillingResetUTC(now);
+    const daysLeft = daysLeftToResetUTC(now);
     const lines = [
       ipCount == null ? null : `Static IPs: ${ipCount}`,
+      `Days left: ${daysLeft}`,
       `Today: ${fmtMBorGB(back_d0.bw, GB_BYTES)}` + (estDayUSD != null ? ` ≈ ${fmtUSD(estDayUSD)}` : ""),
       `MTD:  ${fmtMBorGB(back_m0.bw, GB_BYTES)}` + (estMonthUSD != null ? ` ≈ ${fmtUSD(estMonthUSD)}` : ""),
       back_m0.cost != null ? `API cost (MTD): ${fmtUSD(back_m0.cost)}` : null
