@@ -158,11 +158,11 @@
     // Line 2: Account Balance (New)
     accountBalance !== null ? `Balance: ${fmtUSD(accountBalance)}` : null,
 
-    // Line 3: Cost Logic (Prefer Estimated if pricePerGB is set, else API cost)
-    metrics.monthCost != null 
-      ? `Accrued Cost: ${fmtUSD(metrics.monthCost)}` 
-      : (estMonthUSD ? `Est. Cost: ${fmtUSD(estMonthUSD)}` : null)
-
+    // Line 2: Usage = Estimated Cost (based on pricePerGB)
+    // `Month: ${fmtData(metrics.monthBW)}` + (estMonthUSD ? ` ≈ ${fmtUSD(estMonthUSD)}` : ""),
+    
+    // Line 3: The hard cost returned by the API
+    metrics.monthCost != null ? `Accrued Cost: ${fmtUSD(metrics.monthCost)}` : null
   ].filter(Boolean);
 
   $done({
