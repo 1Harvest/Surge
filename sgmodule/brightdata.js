@@ -110,11 +110,10 @@ httpGet(ipsUrl, (e1, ipsBody) => {
     }
 
     const lines = [
-      ipCount == null ? null : `Static IPs: ${ipCount}`,
-      `Today (back_d0): ${dGB.toFixed(3)} GB (${fmtBytes(back_d0.bw)})` + (estDayUSD != null ? ` ≈ ${fmtUSD(estDayUSD)}` : ""),
-      `MTD  (back_m0): ${mGB.toFixed(3)} GB (${fmtBytes(back_m0.bw)})` + (estMonthUSD != null ? ` ≈ ${fmtUSD(estMonthUSD)}` : ""),
-      back_m0.cost != null ? `API cost (back_m0): ${fmtUSD(back_m0.cost)}` : null,
-      `GB base: ${gbBase} (${GB_BYTES} bytes)`,
+    ipCount == null ? null : `Static IPs: ${ipCount}`,
+    `Today: ${fmtMBorGB(back_d0.bw, GB_BYTES)}` + (estDayUSD != null ? ` ≈ ${fmtUSD(estDayUSD)}` : ""),
+    `MTD:  ${fmtMBorGB(back_m0.bw, GB_BYTES)}` + (estMonthUSD != null ? ` ≈ ${fmtUSD(estMonthUSD)}` : ""),
+    back_m0.cost != null ? `API cost (MTD): ${fmtUSD(back_m0.cost)}` : null,
     ].filter(Boolean);
 
     $done({ title: `Bright Data (${zone})`, style, content: lines.join("\n") });
