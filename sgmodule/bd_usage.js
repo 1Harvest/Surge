@@ -19,173 +19,164 @@
  *   policy=DIRECT                          (optional; default DIRECT)
  ***********************/
 
-function parseArgs(argStr) {
-  var out = {};
-  if (!argStr || typeof argStr !== "string") return out;
-  argStr.split("&").forEach(function (kv) {
-    var parts = kv.split("=");
-    var k = parts[0];
-    var v = parts.length > 1 ? parts.slice(1).join("=") : "";
-    if (!k) return;
-    out[decodeURIComponent(k)] = decodeURIComponent(v);
+/**
+ * Bright Data Monitor for Surge
+ * * Arguments:
+ * token: Your API Token
+ * zone: The Zone name
+ * pricePerGB: (Optional) Cost per GB in USD (e.g., 8.5)
+ * budgetUSD: (Optional) Monthly budget limit for alerts (e.g., 50)
+ * warnPct: (Optional) Warning percentage threshold (default 80)
+ * gbBase: (Optional) "binary" (1024) or "decimal" (1000)
+ */
+
+(async () => {
+  // --- 1. CONFIGURATION & PARSING ---
+  const args = parseArgs(typeof $argument !== "undefined" ? $argument : "");
+  const CONFIG = {
+    token: args.token,
+    zone: args.zone,
+    pricePerGB: args.pricePerGB ? Number(args.pricePerGB) : null,
+    budgetUSD: args.budgetUSD ? Number(args.budgetUSD) : null,
+    warnPct: args.warnPct ? Number(args.warnPct) : 80,
+    gbDivisor: (args.gbBase || "binary").toLowerCase() === "decimal" ? 1e9 : 1073741824, // 1024^3
+  };
+
+  if (!CONFIG.token || !CONFIG.zone) {
+    return $done({
+      title: "Bright Data Error",
+      style: "error",
+      content: "Missing required arguments: token=&zone="
+    });
+  }
+
+  // --- 2. HELPER FUNCTIONS ---
+  
+  // Promisified HTTP Request
+  const fetchAPI = (endpoint) => {
+    return new Promise((resolve) => {
+      const url = `https://api.brightdata.com/zone/${endpoint}?zone=${encodeURIComponent(CONFIG.zone)}`;
+      const headers = { "Authorization": `Bearer ${CONFIG.token}` };
+      
+      $httpClient.get({ url, headers }, (err, resp, data) => {
+        if (err || !resp || resp.status >= 300) {
+          console.log(`[BrightData] Error fetching ${endpoint}: ${err || resp?.status}`);
+          resolve(null); // Resolve null to prevent Promise.all from failing entirely
+        } else {
+          try {
+            resolve(JSON.parse(data));
+          } catch (e) {
+            resolve(null);
+          }
+        }
+      });
+    });
+  };
+
+  // Formatters
+  const fmtUSD = (n) => (isFinite(n) && n != null) ? `$${n.toFixed(2)}` : "—";
+  
+  const fmtData = (bytes) => {
+    const n = Number(bytes);
+    if (!isFinite(n) || n < 0) return "0 MB";
+    if (n < CONFIG.gbDivisor) {
+      const mb = n / (CONFIG.gbDivisor / 1024);
+      return `${mb.toFixed(1)} MB`;
+    }
+    const gb = n / CONFIG.gbDivisor;
+    return `${gb.toFixed(2)} GB`;
+  };
+
+  // --- 3. MAIN LOGIC ---
+
+  // Fetch IPs and Costs in PARALLEL to speed up the script
+  const [ipData, costData] = await Promise.all([
+    fetchAPI("ips"),
+    fetchAPI("cost")
+  ]);
+
+  // Process IP Count (Optional data)
+  const ipCount = (ipData && Array.isArray(ipData.ips)) ? ipData.ips.length : null;
+
+  // Process Costs (Critical data)
+  if (!costData) {
+    return $done({ title: `Bright Data (${CONFIG.zone})`, style: "error", content: "API Request Failed" });
+  }
+
+  // Extract Usage safely
+  // API structure usually: { "zone_name": { "back_m0": {...}, "back_d0": {...} } }
+  const rootKey = Object.keys(costData)[0];
+  const usage = (rootKey && costData[rootKey]) ? costData[rootKey] : {};
+  
+  const metrics = {
+    dayBW: Number(usage.back_d0?.bw) || 0,
+    monthBW: Number(usage.back_m0?.bw) || 0,
+    monthCost: usage.back_m0?.cost // might be undefined if not available
+  };
+
+  // Calculations
+  const mGB = metrics.monthBW / CONFIG.gbDivisor;
+  const dGB = metrics.dayBW / CONFIG.gbDivisor;
+  
+  const estMonthUSD = CONFIG.pricePerGB ? mGB * CONFIG.pricePerGB : metrics.monthCost;
+  const estDayUSD = CONFIG.pricePerGB ? dGB * CONFIG.pricePerGB : null;
+
+  // --- 4. BUDGET & NOTIFICATIONS ---
+  
+  let panelStyle = "info";
+  
+  if (CONFIG.budgetUSD > 0 && estMonthUSD !== null) {
+    const pct = (estMonthUSD / CONFIG.budgetUSD) * 100;
+    const level = pct >= 100 ? "OVER" : pct >= CONFIG.warnPct ? "WARN" : "OK";
+    
+    // Set Panel Style
+    if (level === "WARN") panelStyle = "alert"; // Yellow/Orange in Surge
+    if (level === "OVER") panelStyle = "error"; // Red in Surge
+
+    // Handle Persistent Notification
+    const storeKey = `bd_budget_${CONFIG.zone}`;
+    const lastLevel = $persistentStore.read(storeKey) || "OK";
+
+    if (level !== lastLevel && (level === "WARN" || level === "OVER")) {
+      $notification.post(
+        `Bright Data: ${CONFIG.zone}`,
+        `Budget Alert: ${level}`,
+        `Usage: ${fmtUSD(estMonthUSD)} / ${fmtUSD(CONFIG.budgetUSD)} (${pct.toFixed(0)}%)`
+      );
+    }
+    $persistentStore.write(level, storeKey);
+  }
+
+  // --- 5. UI CONSTRUCTION ---
+
+  const now = new Date();
+  // Calculate days remaining in UTC (BrightData uses UTC billing)
+  const nextReset = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
+  const daysLeft = Math.ceil((nextReset - now) / 86400000);
+
+  const lines = [
+    ipCount !== null ? `Static IPs: ${ipCount}` : null,
+    `Days Left: ${daysLeft}`,
+    `Today: ${fmtData(metrics.dayBW)}` + (estDayUSD ? ` ≈ ${fmtUSD(estDayUSD)}` : ""),
+    `Month: ${fmtData(metrics.monthBW)}` + (estMonthUSD ? ` ≈ ${fmtUSD(estMonthUSD)}` : ""),
+  ].filter(Boolean);
+
+  $done({
+    title: `Bright Data (${CONFIG.zone})`,
+    style: panelStyle,
+    content: lines.join("\n")
+  });
+
+})();
+
+// --- UTILS ---
+function parseArgs(str) {
+  const out = {};
+  if (!str || typeof str !== "string") return out;
+  str.split("&").forEach(pair => {
+    const [k, v] = pair.split("=");
+    if (k) out[decodeURIComponent(k)] = decodeURIComponent(v || "");
   });
   return out;
 }
-
-function fmtUSD(n) {
-  var num = Number(n);
-  if (!isFinite(num)) return "n/a";
-  return "$" + num.toFixed(2);
-}
-
-// No padStart to avoid any runtime quirks
-function z2(x) {
-  x = String(x);
-  return x.length === 1 ? "0" + x : x;
-}
-
-function ymdUTC(d) {
-  return d.getUTCFullYear() + "-" + z2(d.getUTCMonth() + 1) + "-" + z2(d.getUTCDate());
-}
-
-function nextBillingResetUTC(now) {
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1, 0, 0, 0));
-}
-
-function daysLeftToResetUTC(now) {
-  var next = nextBillingResetUTC(now).getTime();
-  var msLeft = next - now.getTime();
-  return Math.max(0, Math.ceil(msLeft / 86400000));
-}
-
-function fmtMBorGB(bytes, GB_BYTES, MB_BYTES) {
-  var n = Number(bytes);
-  if (!isFinite(n) || n < 0) return "—";
-  if (n < GB_BYTES) {
-    var mb = n / MB_BYTES;
-    return (mb >= 100 ? mb.toFixed(0) : mb.toFixed(1)) + " MB";
-  } else {
-    var gb = n / GB_BYTES;
-    return (gb >= 10 ? gb.toFixed(1) : gb.toFixed(3)) + " GB";
-  }
-}
-
-function safeDone(title, style, content) {
-  try {
-    $done({ title: title, style: style, content: content });
-  } catch (e) {
-    // last resort
-    $done({ title: "Bright Data", style: "error", content: "safeDone failed: " + String(e) });
-  }
-}
-
-var args = parseArgs(typeof $argument !== "undefined" ? $argument : "");
-var zone = args.zone;
-
-// allow token= or api_key=
-var storeKey = args.storeKey || "bd_api_key";
-if (args.api_key) $persistentStore.write(args.api_key, storeKey);
-if (args.token) $persistentStore.write(args.token, storeKey);
-var token = $persistentStore.read(storeKey) || args.token || args.api_key;
-
-var debug = String(args.debug || "0") === "1";
-var policy = args.policy || "DIRECT";
-
-var pricePerGB = args.pricePerGB != null ? Number(args.pricePerGB) : null;
-var budgetUSD = args.budgetUSD != null ? Number(args.budgetUSD) : null;
-var warnPct = args.warnPct != null ? Number(args.warnPct) : 80;
-
-var gbBase = (args.gbBase || "binary").toLowerCase(); // binary=1024^3, decimal=1e9
-var GB_BYTES = gbBase === "decimal" ? 1e9 : 1024 * 1024 * 1024;
-var MB_BYTES = gbBase === "decimal" ? 1e6 : 1024 * 1024;
-
-if (!token || !zone) {
-  safeDone(
-    "Bright Data",
-    "error",
-    "Missing args.\nSet zone=... and (token=... or api_key=...).\nTip: run once with api_key=...&storeKey=bd_api_key, then remove api_key."
-  );
-  return;
-}
-
-var headers = { Authorization: "Bearer " + token };
-
-function httpGet(url, cb) {
-  $httpClient.get({ url: url, headers: headers, policy: policy }, function (err, resp, data) {
-    if (err) return cb(err);
-    if (!resp || resp.status < 200 || resp.status >= 300) {
-      return cb(new Error("HTTP " + (resp ? resp.status : "?") + ": " + (data || "")));
-    }
-    cb(null, data);
-  });
-}
-
-var ipsUrl = "https://api.brightdata.com/zone/ips?zone=" + encodeURIComponent(zone);
-var costUrl = "https://api.brightdata.com/zone/cost?zone=" + encodeURIComponent(zone); // zone usage/cost endpoint :contentReference[oaicite:1]{index=1}
-
-httpGet(ipsUrl, function (e1, ipsBody) {
-  var ipCount = null;
-  if (!e1) {
-    try {
-      var j1 = JSON.parse(ipsBody);
-      if (j1 && Array.isArray(j1.ips)) ipCount = j1.ips.length;
-    } catch (_) {}
-  }
-
-  httpGet(costUrl, function (e2, costBody) {
-    if (e2) {
-      safeDone("Bright Data (" + zone + ")", "error", "Failed /zone/cost\n" + String(e2));
-      return;
-    }
-
-    try {
-      if (debug) {
-        safeDone("Bright Data (" + zone + ")", "info", "DEBUG /zone/cost (first 900 chars):\n" + String(costBody).slice(0, 900));
-        return;
-      }
-
-      var obj = JSON.parse(costBody);
-      var rootKey = Object.keys(obj)[0];
-      var buckets = rootKey ? obj[rootKey] : obj;
-
-      var back_m0 = buckets && buckets.back_m0 ? buckets.back_m0 : {};
-      var back_d0 = buckets && buckets.back_d0 ? buckets.back_d0 : {};
-
-      var m_bw = Number(back_m0.bw) || 0;
-      var d_bw = Number(back_d0.bw) || 0;
-
-      var mGB = m_bw / GB_BYTES;
-      var dGB = d_bw / GB_BYTES;
-
-      var estMonthUSD = pricePerGB != null ? mGB * pricePerGB : null;
-      var estDayUSD = pricePerGB != null ? dGB * pricePerGB : null;
-
-      var apiMonthCost = (back_m0.cost != null && isFinite(Number(back_m0.cost))) ? Number(back_m0.cost) : null;
-      var monthCostUsed = apiMonthCost != null ? apiMonthCost : estMonthUSD;
-
-      var style = "info";
-      if (budgetUSD != null && monthCostUsed != null && isFinite(monthCostUsed) && budgetUSD > 0) {
-        var pct = (monthCostUsed / budgetUSD) * 100;
-        if (pct >= 100) style = "error";
-        else if (pct >= warnPct) style = "warning";
-      }
-
-      var now = new Date();
-      var reset = nextBillingResetUTC(now);
-      var daysLeft = daysLeftToResetUTC(now);
-
-      var lines = [
-        ipCount == null ? null : "Static IPs: " + ipCount,
-        "Cycle resets: " + ymdUTC(reset) + " 00:00 UTC (" + daysLeft + "d left)",
-        "Today: " + fmtMBorGB(d_bw, GB_BYTES, MB_BYTES) + (estDayUSD != null ? " ≈ " + fmtUSD(estDayUSD) : ""),
-        "MTD:  " + fmtMBorGB(m_bw, GB_BYTES, MB_BYTES) + (monthCostUsed != null ? " ≈ " + fmtUSD(monthCostUsed) : ""),
-        apiMonthCost != null ? "API cost (MTD): " + fmtUSD(apiMonthCost) : null
-      ].filter(function (x) { return !!x; });
-
-      safeDone("Bright Data (" + zone + ")", style, lines.join("\n"));
-    } catch (e) {
-      safeDone("Bright Data (" + zone + ")", "error", "Render error:\n" + String(e));
-    }
-  });
-});
 
