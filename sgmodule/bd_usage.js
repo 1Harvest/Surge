@@ -155,10 +155,14 @@
   const daysLeft = Math.ceil((nextReset - now) / 86400000);
 
   const lines = [
-    ipCount !== null ? `Static IPs: ${ipCount}` : null,
-    `Days Left: ${daysLeft}`,
-    `Today: ${fmtData(metrics.dayBW)}` + (estDayUSD ? ` ≈ ${fmtUSD(estDayUSD)}` : ""),
-    `Month: ${fmtData(metrics.monthCost)}` + (estMonthUSD ? ` ≈ ${fmtUSD(estMonthUSD)}` : ""),
+    // Line 1: Combined IPs and Days
+    `Static IPs: ${ipCount || 0} | Days Left: ${daysLeft}`,
+    
+    // Line 2: Usage = Estimated Cost (based on pricePerGB)
+    `Month: ${fmtData(metrics.monthBW)}` + (estMonthUSD ? ` = ${fmtUSD(estMonthUSD)}` : ""),
+    
+    // Line 3: The hard cost returned by the API
+    metrics.monthCost != null ? `Actual Cost: ${fmtUSD(metrics.monthCost)}` : null
   ].filter(Boolean);
 
   $done({
